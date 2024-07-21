@@ -1,0 +1,5 @@
+build/
+ip/
+obj_dir/
+synth/
+*.fst
