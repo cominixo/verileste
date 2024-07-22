@@ -22,7 +22,9 @@ module verileste (
     vec2dint player_pos;
     vec2d    player_spd;
 
-
+    initial begin
+        $readmemh("../is_solid.mem", solid_map);
+    end
     
     always_ff @(posedge clk) begin
         if (rst) begin

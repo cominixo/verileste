@@ -17,12 +17,14 @@ module move (
     initial begin
         //$readmemh("map.mem", p8_map);
         //$readmemh("flags.mem", flags);
+
+        //$readmemh("../is_solid.mem", solid_map);
         
         // 100m hack for berry blocks
-        p8_map[4][1] = 1'b1;
-        p8_map[4][2] = 1'b1;
-        p8_map[5][1] = 1'b1;
-        p8_map[5][2] = 1'b1;
+        // p8_map[4][1] = 1'b1;
+        // p8_map[4][2] = 1'b1;
+        // p8_map[5][1] = 1'b1;
+        // p8_map[5][2] = 1'b1;
     end
 
     always_comb begin

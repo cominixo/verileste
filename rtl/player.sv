@@ -28,10 +28,11 @@ module player (
     
     initial begin
         // 100m hack for berry blocks
-        p8_map[4][1] = 1'b1;
-        p8_map[4][2] = 1'b1;
-        p8_map[5][1] = 1'b1;
-        p8_map[5][2] = 1'b1;
+        // p8_map[4][1] = 1'b1;
+        // p8_map[4][2] = 1'b1;
+        // p8_map[5][1] = 1'b1;
+        // p8_map[5][2] = 1'b1;
+        //$readmemh("../is_solid.mem", solid_map);
     end
 
     logic [1:0] max_djump, djump, djump_r;
