@@ -32,6 +32,8 @@ module player (
     logic [31:0] dash_effect_time, dash_effect_time_r, maxfall;
     logic [31:0] h_input;
     
+    vec2dint pos_hitbox;
+    
     //vec2d dash_target, dash_accel;
 
     logic [31:0] accel, deccel; 
@@ -40,8 +42,11 @@ module player (
 
     assign h_input = btn[BTN_RIGHT] ? 32'h00010000 : btn[BTN_LEFT] ? 32'hffff0000 : '0;
 
+    assign pos_hitbox.x = pos_i.x + HITBOX_X;
+    assign pos_hitbox.y = pos_i.y + HITBOX_Y;
+
     always_comb begin
-        on_ground = is_solid((pos_i.x)+HITBOX_X, (pos_i.y)+HITBOX_Y+1);
+        on_ground = is_solid(pos_hitbox.x, pos_hitbox.y+1);
         jump      = (btn[BTN_O]) && !p_jump;
         dash      = (btn[BTN_X]) && !p_dash;
         jbuffer   = jbuffer_r;
@@ -91,7 +96,7 @@ module player (
         //if (spd_i.x != 0) begin
         
         // wallslide (TODO: ice)
-        if (h_input != '0 && is_solid((pos_i.x)+HITBOX_X+16'(h_input>>16), (pos_i.y)+HITBOX_Y)) begin
+        if (h_input != '0 && is_solid(pos_hitbox.x+16'(h_input>>16), pos_hitbox.y)) begin
             maxfall = 32'h00006666;
         end 
         else begin
@@ -99,14 +104,14 @@ module player (
         end
 
         if (!on_ground) begin
-            spd_o.y = appr(spd_i.y, maxfall, abs(spd_i.y) > 32'h00002666 ? 32'h000035c2 : 32'h00001ae1); 
+            spd_o.y = appr(spd_i.y, maxfall, (abs(spd_i.y) > 32'h00002666 ? 32'h000035c2 : 32'h00001ae1)); 
         end
 
         wall_dir = '0;
-        if (is_solid((pos_i.x)+HITBOX_X-3, (pos_i.y)+HITBOX_Y)) begin
+        if (is_solid(pos_hitbox.x-3, pos_hitbox.y)) begin
             wall_dir = 32'hffff0000;
         end
-        else if (is_solid((pos_i.x)+HITBOX_X+3, (pos_i.y)+HITBOX_Y)) begin
+        else if (is_solid(pos_hitbox.x+3, pos_hitbox.y)) begin
             wall_dir = 32'h00010000;
         end
 
