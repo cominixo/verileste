@@ -25,15 +25,6 @@ module player (
     localparam HITBOX_Y  = 3;
     localparam HITBOX_W  = 6;
     localparam HITBOX_H  = 5;
-    
-    initial begin
-        // 100m hack for berry blocks
-        // p8_map[4][1] = 1'b1;
-        // p8_map[4][2] = 1'b1;
-        // p8_map[5][1] = 1'b1;
-        // p8_map[5][2] = 1'b1;
-        //$readmemh("../is_solid.mem", solid_map);
-    end
 
     logic [1:0] max_djump, djump, djump_r;
     logic [2:0] grace, grace_r, dash_time, jbuffer, jbuffer_r;
@@ -50,7 +41,7 @@ module player (
     assign h_input = btn[BTN_RIGHT] ? 32'h00010000 : btn[BTN_LEFT] ? 32'hffff0000 : '0;
 
     always_comb begin
-        on_ground = is_solid((pos_i.x)+HITBOX_X, (pos_i.y)+HITBOX_Y+1, HITBOX_W, HITBOX_H);
+        on_ground = is_solid((pos_i.x)+HITBOX_X, (pos_i.y)+HITBOX_Y+1);
         jump      = (btn[BTN_O]) && !p_jump;
         dash      = (btn[BTN_X]) && !p_dash;
         jbuffer   = jbuffer_r;
@@ -91,13 +82,16 @@ module player (
             spd_o.x = appr(spd_i.x, h_input, accel);
         end
         else begin
-            spd_o.x = appr(spd_i.x, sign(spd_i.x), deccel);
+            spd_o.x = appr_pos(abs(spd_i.x), 32'h00010000, deccel);
+            if (spd_i.x[31]) begin
+                spd_o.x = -spd_o.x;
+            end
         end
 
         //if (spd_i.x != 0) begin
         
         // wallslide (TODO: ice)
-        if (h_input != '0 && is_solid((pos_i.x)+HITBOX_X+16'(h_input>>16), (pos_i.y)+HITBOX_Y, HITBOX_W, HITBOX_H)) begin
+        if (h_input != '0 && is_solid((pos_i.x)+HITBOX_X+16'(h_input>>16), (pos_i.y)+HITBOX_Y)) begin
             maxfall = 32'h00006666;
         end 
         else begin
@@ -105,19 +99,14 @@ module player (
         end
 
         if (!on_ground) begin
-            if (abs(spd_i.y) > 32'h00002666) begin // 0.15
-                spd_o.y = appr(spd_i.y, maxfall, 32'h000035c2); // 0.21
-            end
-            else begin
-                spd_o.y = appr(spd_i.y, maxfall, 32'h00001ae1); // 0.105
-            end
+            spd_o.y = appr(spd_i.y, maxfall, abs(spd_i.y) > 32'h00002666 ? 32'h000035c2 : 32'h00001ae1); 
         end
 
         wall_dir = '0;
-        if (is_solid((pos_i.x)+HITBOX_X-3, (pos_i.y)+HITBOX_Y, HITBOX_W, HITBOX_H)) begin
+        if (is_solid((pos_i.x)+HITBOX_X-3, (pos_i.y)+HITBOX_Y)) begin
             wall_dir = 32'hffff0000;
         end
-        else if (is_solid((pos_i.x)+HITBOX_X+3, (pos_i.y)+HITBOX_Y, HITBOX_W, HITBOX_H)) begin
+        else if (is_solid((pos_i.x)+HITBOX_X+3, (pos_i.y)+HITBOX_Y)) begin
             wall_dir = 32'h00010000;
         end
 

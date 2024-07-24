@@ -26,7 +26,14 @@ function logic [31:0] appr (logic signed [31:0] val, logic signed [31:0] target,
     appr = val > target ? (val_minus > target ? val_minus : target) : (val_plus < target ? val_plus : target);
 endfunction
 
-function logic is_solid (logic [15:0] obj_x, logic [15:0] obj_y, int w, int h);
+function logic [31:0] appr_pos (logic signed [31:0] val, logic signed [31:0] target, logic signed [31:0] amount);
+    logic signed [31:0] val_minus;
+    val_minus = val-amount;
+
+    appr_pos = (val_minus > target ? val_minus : target);
+endfunction
+
+function logic is_solid (logic [15:0] obj_x, logic [15:0] obj_y);
 
     if (obj_x[15] == 1'b1) begin
         obj_x = '0;
